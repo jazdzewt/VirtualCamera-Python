@@ -139,25 +139,10 @@ def main():
         if keys[pygame.K_LCTRL]: 
             dy -= predkosc_ruchu # dół
 
-        '''
-        if abs(dx) > 0 or abs(dy) > 0 or abs(dz) > 0:
-            
-            view_mat = camera.macierz_widoku()
-            
-            rot_mat_inv = view_mat[:3, :3].T
-
-            #  wektor przemieszczenia
-            lokalny_kierunek = np.array([dx, dy, dz])
-
-            globalny_kierunek = rot_mat_inv @ lokalny_kierunek
-
-            camera.pozycja[0] += globalny_kierunek[0]
-            camera.pozycja[1] += globalny_kierunek[1]
-            camera.pozycja[2] += globalny_kierunek[2]
-        '''
-        # ruch w globalnym układzie
         camera.pozycja[0] += dx
+
         camera.pozycja[1] += dy
+        
         camera.pozycja[2] += dz
 
         predkosc_obrotu = 0.01
