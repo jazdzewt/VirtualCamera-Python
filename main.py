@@ -143,7 +143,6 @@ def main():
             
             view_mat = camera.macierz_widoku()
             
-            # wciągamy z macierzy widoku sam fragment odpowiedzialny za rotację
             rot_mat_inv = view_mat[:3, :3].T
 
             #  wektor przemieszczenia
