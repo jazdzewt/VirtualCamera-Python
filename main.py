@@ -2,7 +2,9 @@ import pygame
 import numpy as np
 import sys
 
-WIDTH, HEIGHT = 800, 600
+SZEROKOSC = 1200 
+WYSOKOSC = 700
+
 
 class VirtualCamera:
     def __init__(self):
@@ -18,7 +20,7 @@ class VirtualCamera:
         # przechylenie na boki 
         self.przechylenie = 0   
 
-        self.f = 500
+        self.f = 600
 
     def macierz_widoku(self):
 
@@ -63,8 +65,8 @@ class VirtualCamera:
             return None 
         
         # parametr f modyfikuje kąt widzenia
-        x_2d = (x * self.f) / z + WIDTH // 2
-        y_2d = (-y * self.f) / z + HEIGHT // 2
+        x_2d = (x * self.f) / z + SZEROKOSC // 2
+        y_2d = (-y * self.f) / z + WYSOKOSC // 2
         
         return int(x_2d), int(y_2d)
 
@@ -103,7 +105,7 @@ def main():
 
     pygame.init()
 
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    screen = pygame.display.set_mode((SZEROKOSC, WYSOKOSC))
     clock = pygame.time.Clock()
     camera = VirtualCamera()
     
