@@ -149,7 +149,6 @@ def main():
             #  wektor przemieszczenia
             lokalny_kierunek = np.array([dx, dy, dz])
 
-            # transformujemy wektor lokalnego przemieszczenia tak, aby został przekalkulowany na poprawne przesunięcie w przestrzeni po głównych osiach
             globalny_kierunek = rot_mat_inv @ lokalny_kierunek
 
             camera.pozycja[0] += globalny_kierunek[0]
