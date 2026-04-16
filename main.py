@@ -107,6 +107,7 @@ def main():
     clock = pygame.time.Clock()
     camera = VirtualCamera()
     
+    
     wezly, krawedzie = wczytaj_obiekt('data/scena.txt')
 
     while True:
