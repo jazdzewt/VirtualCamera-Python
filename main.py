@@ -93,6 +93,8 @@ def wczytaj_obiekt(filename):
                     for i in range(len(index)):
                         krawedzie.append((index[i - 1], index[i]))
                 
+            #print(krawedzie)
+            #print(wezly)
         return np.array(wezly), krawedzie
 
     except FileNotFoundError:
