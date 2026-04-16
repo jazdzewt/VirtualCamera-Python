@@ -11,11 +11,12 @@ class VirtualCamera:
 
         self.pozycja = np.array([0.0, 0.0, 0.0, 1.0])
 
-        # lewo / prawo
-        self.obrot = 0
-
         # góra / dół
-        self.nachylenie = 0
+        self.nachylenie = 0 
+
+        # lewo / prawo
+        self.obrot = 0 
+
 
         # przechylenie na boki 
         self.przechylenie = 0   
@@ -31,48 +32,45 @@ class VirtualCamera:
             [0, 0, 1, -self.pozycja[2]],
             [0, 0, 0, 1]])
 
-        # macierze rotacji
-        ro = self.obrot
-        r_obrot = np.array([
-            [np.cos(ro), 0, np.sin(ro), 0],
-            [0, 1, 0, 0],
-            [-np.sin(ro), 0, np.cos(ro), 0],
-            [0, 0, 0, 1]])
-
-        rn = self.nachylenie
+        # macierze rotacji  
         r_nachylenie = np.array([
             [1, 0, 0, 0],
-            [0, np.cos(rn), -np.sin(rn), 0],
-            [0, np.sin(rn), np.cos(rn), 0],
+            [0, np.cos(self.nachylenie), -np.sin(self.nachylenie), 0],
+            [0, np.sin(self.nachylenie), np.cos(self.nachylenie), 0],  
             [0, 0, 0, 1]])
 
-        rp = self.przechylenie
         r_przechylenie = np.array([
-            [np.cos(rp), -np.sin(rp), 0, 0],
-            [np.sin(rp), np.cos(rp), 0, 0],
+            [np.cos(self.przechylenie), -np.sin(self.przechylenie), 0, 0],
+            [np.sin(self.przechylenie), np.cos(self.przechylenie), 0, 0], 
             [0, 0, 1, 0],
             [0, 0, 0, 1]])
 
-        # połączona macierz widoku
-        return r_przechylenie @ r_nachylenie @ r_obrot @ t_mat
+        r_obrot = np.array([
+            [np.cos(self.obrot), 0, np.sin(self.obrot), 0],
+            [0, 1, 0, 0],
+            [-np.sin(self.obrot), 0, np.cos(self.obrot), 0],
+            [0, 0, 0, 1]])
+        # macierz widoku
+        macierz_w = r_przechylenie @ r_nachylenie @ r_obrot @ t_mat
 
-    def project(self, punkt_3d):
+        return macierz_w
 
-        x, y, z, w = punkt_3d
+    def rzutowanie(self, punkt):
+
+        x, y, z, w = punkt
         
-        # nie rysujemy obiektów za kamerą
         if z <= 0.1:
             return None 
         
-        # parametr f modyfikuje kąt widzenia
-        x_2d = (x * self.f) / z + SZEROKOSC // 2
-        y_2d = (-y * self.f) / z + WYSOKOSC // 2
+        x_2d = (x * self.f) / z + SZEROKOSC / 2
+        y_2d = (-y * self.f) / z + WYSOKOSC / 2
         
         return int(x_2d), int(y_2d)
 
 def wczytaj_obiekt(filename):
 
-    wezly = []
+    wezly = [] 
+
     krawedzie = []
 
     try:
@@ -85,7 +83,7 @@ def wczytaj_obiekt(filename):
                     continue
 
                 if parts[0] == 'w':
-                # w id x y z -> dodajemy 1 dla współrzędnych jednorodnych 
+                # w id x y z
                     wezly.append([float(parts[2]), float(parts[3]), float(parts[4]), 1.0])
 
                 elif parts[0] == 'k':
@@ -94,7 +92,7 @@ def wczytaj_obiekt(filename):
 
                     for i in range(len(index)):
                         krawedzie.append((index[i - 1], index[i]))
-
+                
         return np.array(wezly), krawedzie
 
     except FileNotFoundError:
@@ -122,75 +120,77 @@ def main():
 
         keys = pygame.key.get_pressed()
 
-        dx, dy, dz = 0.0, 0.0, 0.0
+        x = 0.0  
+        y = 0.0 
+        z = 0.0 
 
-        predkosc_ruchu = 0.1
+        krok1 = 0.1
 
         if keys[pygame.K_w]: 
-            dz += predkosc_ruchu  # przód
+            z = z + krok1  # przód
         if keys[pygame.K_s]: 
-            dz -= predkosc_ruchu  # tył
+            z = z - krok1  # tył
         if keys[pygame.K_a]: 
-            dx -= predkosc_ruchu  # lewo
+            x = x - krok1  # lewo
         if keys[pygame.K_d]: 
-            dx += predkosc_ruchu # prawo
+            x = x + krok1 # prawo
         if keys[pygame.K_SPACE]: 
-            dy += predkosc_ruchu # góra
+            y = y + krok1 # góra
         if keys[pygame.K_LCTRL]: 
-            dy -= predkosc_ruchu # dół
+            y = y - krok1 # dół
 
-        camera.pozycja[0] += dx
+        camera.pozycja[0] = camera.pozycja[0] + x
 
-        camera.pozycja[1] += dy
+        camera.pozycja[1] = camera.pozycja[1] + y
         
-        camera.pozycja[2] += dz
+        camera.pozycja[2] = camera.pozycja[2] + z
 
-        predkosc_obrotu = 0.01
+        krok2 = 0.01
 
         if keys[pygame.K_LEFT]: 
-            camera.obrot += predkosc_obrotu
+            camera.obrot = camera.obrot + krok2
         if keys[pygame.K_RIGHT]: 
-            camera.obrot -= predkosc_obrotu
+            camera.obrot = camera.obrot - krok2
 
         if keys[pygame.K_q]: 
-            camera.przechylenie -= predkosc_obrotu
+            camera.przechylenie = camera.przechylenie - krok2
         if keys[pygame.K_e]: 
-            camera.przechylenie += predkosc_obrotu
+            camera.przechylenie = camera.przechylenie + krok2
 
         if keys[pygame.K_UP]: 
-            camera.nachylenie += predkosc_obrotu
+            camera.nachylenie = camera.nachylenie + krok2
         if keys[pygame.K_DOWN]: 
-            camera.nachylenie -= predkosc_obrotu
+            camera.nachylenie = camera.nachylenie - krok2
         
-        # ZOOM (zmiana parametru f)
+        # ZOOM
         zoom = 5
         
         if keys[pygame.K_EQUALS]: 
-            camera.f += zoom
-        if keys[pygame.K_MINUS]: 
-            camera.f -= zoom
+            camera.f = camera.f + zoom
+        if keys[pygame.K_MINUS]:  
+            camera.f = camera.f - zoom  
 
         # renderowanie 
-        macierz_widoku = camera.macierz_widoku()
-        
-        # transformacja wszystkich punktów do układu kamery 
-        przetransformowane_wezly = [macierz_widoku @ w for w in wezly]
-        
-        # rzutowanie na 2D i rysowanie krawędzi 
-        zrzutowane_punkty = {}
-        for index, wezel_kamera in enumerate(przetransformowane_wezly):
-            punkt_2d = camera.project(wezel_kamera)
-            if punkt_2d:
-                zrzutowane_punkty[index] = punkt_2d
+        macierz_widoku = camera.macierz_widoku() 
+         
+        przetransformowane_wezly = []
+        for w in wezly:
+            przetransformowane_wezly.append(macierz_widoku @ w)
 
-        for index_poczatkowy, index_koncowy in krawedzie:
-            if index_poczatkowy in zrzutowane_punkty and index_koncowy in zrzutowane_punkty:
+        for id_poczatkowy, id_koncowy in krawedzie:
+            
+            wezel_poczatkowy = przetransformowane_wezly[id_poczatkowy]
+            wezel_koncowy = przetransformowane_wezly[id_koncowy]
 
-                pygame.draw.line(screen, (0, 0, 0), zrzutowane_punkty[index_poczatkowy], zrzutowane_punkty[index_koncowy], 2)
+            punkt_pocz = camera.rzutowanie(wezel_poczatkowy)
+            punkt_kon = camera.rzutowanie(wezel_koncowy)
+
+            if punkt_pocz and punkt_kon:
+                pygame.draw.line(screen, (0, 0, 0), punkt_pocz, punkt_kon, 2)
 
         pygame.display.flip()
 
-        clock.tick(60) #fps
+        clock.tick(60) #fps  
 
 if __name__ == "__main__":
-    main()
+    main() 
