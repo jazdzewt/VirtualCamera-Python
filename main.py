@@ -57,7 +57,9 @@ class VirtualCamera:
 
     def rzutowanie(self, punkt):
 
-        x, y, z, w = punkt
+        x = punkt[0]
+        y = punkt[1]
+        z = punkt[2]
         
         if z <= 0.1:
             return None 
