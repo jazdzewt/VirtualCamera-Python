@@ -12,7 +12,7 @@ class VirtualCamera:
         self.pozycja = np.array([0.0, 0.0, 0.0, 1.0])
 
         # góra / dół
-        self.nachylenie = 0 
+        self.pochylenie = 0 
 
         # lewo / prawo
         self.obrot = 0 
@@ -33,10 +33,10 @@ class VirtualCamera:
             [0, 0, 0, 1]])
 
         # macierze rotacji  
-        r_nachylenie = np.array([
+        r_pochylenie = np.array([
             [1, 0, 0, 0],
-            [0, np.cos(self.nachylenie), -np.sin(self.nachylenie), 0],
-            [0, np.sin(self.nachylenie), np.cos(self.nachylenie), 0],  
+            [0, np.cos(self.pochylenie), -np.sin(self.pochylenie), 0],
+            [0, np.sin(self.pochylenie), np.cos(self.pochylenie), 0],  
             [0, 0, 0, 1]])
 
         r_przechylenie = np.array([
@@ -51,7 +51,7 @@ class VirtualCamera:
             [-np.sin(self.obrot), 0, np.cos(self.obrot), 0],
             [0, 0, 0, 1]])
         # macierz widoku
-        macierz_w = r_przechylenie @ r_nachylenie @ r_obrot @ t_mat
+        macierz_w = r_przechylenie @ r_pochylenie @ r_obrot @ t_mat
 
         return macierz_w
 
@@ -144,11 +144,18 @@ def main():
         if keys[pygame.K_LCTRL]: 
             y = y - krok1 # dół
 
-        camera.pozycja[0] = camera.pozycja[0] + x
+        if x != 0 or y != 0 or z != 0:
+            
+            macierz_w = camera.macierz_widoku()
+            
+            macierz_w_T = macierz_w.T
+            lokalny_kierunek = np.array([x, y, z, 0.0])
 
-        camera.pozycja[1] = camera.pozycja[1] + y
-        
-        camera.pozycja[2] = camera.pozycja[2] + z
+            globalny_kierunek = macierz_w_T @ lokalny_kierunek
+
+            camera.pozycja[0] = camera.pozycja[0] + globalny_kierunek[0]
+            camera.pozycja[1] = camera.pozycja[1] + globalny_kierunek[1]
+            camera.pozycja[2] = camera.pozycja[2] + globalny_kierunek[2]
 
         krok2 = 0.01
 
@@ -163,9 +170,9 @@ def main():
             camera.przechylenie = camera.przechylenie + krok2
 
         if keys[pygame.K_UP]: 
-            camera.nachylenie = camera.nachylenie + krok2
+            camera.pochylenie = camera.pochylenie + krok2
         if keys[pygame.K_DOWN]: 
-            camera.nachylenie = camera.nachylenie - krok2
+            camera.pochylenie = camera.pochylenie - krok2
         
         # ZOOM
         zoom = 5
