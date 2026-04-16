@@ -2,8 +2,8 @@ import pygame
 import numpy as np
 import sys
 
-SZEROKOSC = 1200 
-WYSOKOSC = 700
+szerokosc = 1200 
+wysokosc = 700
 
 
 class VirtualCamera:
@@ -62,8 +62,8 @@ class VirtualCamera:
         if z <= 0.1:
             return None 
         
-        x_2d = (x * self.f) / z + SZEROKOSC / 2
-        y_2d = (-y * self.f) / z + WYSOKOSC / 2
+        x_2d = (x * self.f) / z + szerokosc / 2
+        y_2d = (-y * self.f) / z + wysokosc / 2
         
         return int(x_2d), int(y_2d)
 
@@ -103,7 +103,7 @@ def main():
 
     pygame.init()
 
-    screen = pygame.display.set_mode((SZEROKOSC, WYSOKOSC))
+    screen = pygame.display.set_mode((szerokosc, wysokosc))
     clock = pygame.time.Clock()
     camera = VirtualCamera()
     
